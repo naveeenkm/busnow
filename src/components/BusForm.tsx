@@ -32,64 +32,68 @@ export const fmt12h = (val: string) => {
 
 // ── TimePicker ─────────────────────────────────────────────────────────
 export const TimePicker = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
-  const [confirmed, setConfirmed] = useState(!!value);
   const { h, m, ampm } = to12h(value);
+  const confirmed = !!value;
 
-  const setH = (raw: string) => {
-    const n = parseInt(raw);
-    if (raw === "") { onChange(to24h("12", m, ampm)); return; }
-    if (isNaN(n) || n < 1 || n > 12) return;
-    onChange(to24h(String(n), m, ampm));
-  };
-
-  const setM = (raw: string) => {
-    const n = parseInt(raw);
-    if (raw === "") { onChange(to24h(h, "00", ampm)); return; }
-    if (isNaN(n) || n < 0 || n > 59) return;
-    onChange(to24h(h, String(n).padStart(2, "0"), ampm));
-  };
-
-  const toggleAmpm = () => onChange(to24h(h, m, ampm === "AM" ? "PM" : "AM"));
+  const update = (newH: string, newM: string, newAmpm: string) =>
+    onChange(to24h(newH, newM, newAmpm));
 
   if (!confirmed) {
     return (
       <button
         type="button"
-        onClick={() => { setConfirmed(true); onChange(to24h("12", "00", "AM")); }}
+        onClick={() => {
+          const now = new Date();
+          onChange(to24h(String(now.getHours() % 12 || 12), String(now.getMinutes()).padStart(2, "0"), now.getHours() >= 12 ? "PM" : "AM"));
+        }}
         className="inline-flex items-center gap-2 rounded-md border border-dashed border-input px-4 py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors"
       >
-        <span>🕐</span> Click to set arrival time
+        <span>🕐</span> Tap to set arrival time
       </button>
     );
   }
 
+  const selectCls = "rounded-md border border-input bg-background px-2 py-2 text-sm font-mono text-center focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer";
+
   return (
-    <div className="flex items-center gap-1.5">
-      <input
-        type="number" min={1} max={12}
+    <div className="flex items-center gap-2">
+      {/* Hour */}
+      <select
         value={h}
-        onChange={(e) => setH(e.target.value)}
-        className="w-14 rounded-md border border-input bg-background px-2 py-1.5 text-center text-sm font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
-        placeholder="12"
-      />
-      <span className="text-muted-foreground font-bold">:</span>
-      <input
-        type="number" min={0} max={59}
-        value={m}
-        onChange={(e) => setM(e.target.value)}
-        className="w-14 rounded-md border border-input bg-background px-2 py-1.5 text-center text-sm font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
-        placeholder="00"
-      />
-      <button
-        type="button"
-        onClick={toggleAmpm}
-        className="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent transition-colors min-w-[52px]"
+        onChange={(e) => update(e.target.value, m, ampm)}
+        className={`${selectCls} w-16`}
       >
-        {ampm}
-      </button>
+        {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((v) => (
+          <option key={v} value={v}>{v.padStart(2, "0")}</option>
+        ))}
+      </select>
+
+      <span className="text-muted-foreground font-bold text-lg">:</span>
+
+      {/* Minute */}
+      <select
+        value={m}
+        onChange={(e) => update(h, e.target.value, ampm)}
+        className={`${selectCls} w-16`}
+      >
+        {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((v) => (
+          <option key={v} value={v}>{v}</option>
+        ))}
+      </select>
+
+      {/* AM/PM */}
+      <select
+        value={ampm}
+        onChange={(e) => update(h, m, e.target.value)}
+        className={`${selectCls} w-20`}
+      >
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
+
       <button
         type="button"
-        onClick={() => { setConfirmed(false); onChange(""); }}
+        onClick={() => onChange("")}
         className="text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
       >
         ✕
