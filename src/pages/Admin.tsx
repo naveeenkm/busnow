@@ -29,6 +29,8 @@ const Admin = () => {
   const [form, setForm] = useState<BusFormData>({ ...empty });
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [savingBus, setSavingBus] = useState(false);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -58,6 +60,7 @@ const Admin = () => {
     e.preventDefault();
     if (!form.fromCity || !form.toCity || !form.arrivalTime) return toast.error("From, To and Arrival time required");
     if (isSameCity(form.fromCity, form.toCity)) return toast.error("From and To cities cannot be the same");
+    setSavingBus(true);
     try {
       if (editing) await api.put(`/buses/${editing._id}`, form);
       else await api.post("/buses", form);
@@ -65,6 +68,7 @@ const Admin = () => {
       setOpen(false);
       load();
     } catch (e) { toast.error(apiError(e)); }
+    finally { setSavingBus(false); }
   };
 
   const deleteBus = async (id: string) => {
@@ -74,11 +78,13 @@ const Admin = () => {
   };
 
   const decideRequest = async (id: string, status: "approved" | "rejected", reason = "") => {
+    if (status === "approved") setApprovingId(id);
     try {
       await api.patch(`/route-requests/${id}`, { status, rejectionReason: reason });
       load(); refreshPending();
       toast.success(`Request ${status}`);
     } catch (e) { toast.error(apiError(e)); }
+    finally { setApprovingId(null); }
   };
 
   const handleReject = (id: string) => { setRejectId(id); setRejectReason(""); };
@@ -116,7 +122,9 @@ const Admin = () => {
               <form onSubmit={saveBus} className="space-y-4">
                 <BusForm value={form} onChange={setForm} />
                 <DialogFooter>
-                  <Button type="submit">{editing ? "Save changes" : "Add bus"}</Button>
+                  <Button type="submit" disabled={savingBus}>
+                    {savingBus ? (editing ? "Saving…" : "Adding…") : (editing ? "Save changes" : "Add bus")}
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -165,14 +173,15 @@ const Admin = () => {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="font-medium">{r.fromCity} → {r.toCity}</div>
-                        {r.arrivalTime && <div className="text-xs text-muted-foreground">arr {fmt12h(r.arrivalTime)}</div>}
+                        {r.name && <div className="text-xs font-medium text-primary">{r.name}</div>}
+                        <div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                          {r.arrivalTime && <span>Preferred arrival: {fmt12h(r.arrivalTime)}</span>}
+                          <span>{r.requestedBy?.name || r.contactEmail || "Anonymous"} · {new Date(r.createdAt).toLocaleString()}</span>
+                        </div>
                         {r.notes && <div className="mt-1 text-sm text-muted-foreground">{r.notes}</div>}
                         {r.status === "rejected" && r.rejectionReason && (
                           <div className="mt-1 text-xs text-destructive">Reason: {r.rejectionReason}</div>
                         )}
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {r.requestedBy?.name || r.contactEmail || "Anonymous"} · {new Date(r.createdAt).toLocaleString()}
-                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant={r.status === "pending" ? "secondary" : r.status === "approved" ? "default" : "destructive"}>
@@ -180,7 +189,11 @@ const Admin = () => {
                         </Badge>
                         {r.status === "pending" && (
                           <>
-                            <Button size="icon" variant="outline" onClick={() => decideRequest(r._id, "approved")}><Check className="h-4 w-4 text-green-500" /></Button>
+                            <Button size="icon" variant="outline" disabled={approvingId === r._id} onClick={() => decideRequest(r._id, "approved")}>
+                              {approvingId === r._id
+                                ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+                                : <Check className="h-4 w-4 text-green-500" />}
+                            </Button>
                             <Button size="icon" variant="outline" onClick={() => handleReject(r._id)}><X className="h-4 w-4 text-destructive" /></Button>
                           </>
                         )}

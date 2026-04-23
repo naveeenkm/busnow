@@ -101,6 +101,7 @@ const Dashboard = () => {
                   <Card key={r._id} className={`flex items-start justify-between p-4 ${r.status === "rejected" ? "border-destructive/40 bg-destructive/5" : ""}`}>
                     <div>
                       <div className="text-sm font-medium">{r.fromCity} → {r.toCity}</div>
+                      {r.name && <div className="text-xs font-medium text-primary">{r.name}</div>}
                       <div className="text-xs text-muted-foreground">
                         {r.arrivalTime && <>arr {fmt12h(r.arrivalTime)} · </>}
                         {new Date(r.createdAt).toLocaleDateString()}

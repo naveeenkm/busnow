@@ -30,6 +30,7 @@ export interface RouteRequest {
   _id: string;
   fromCity: string;
   toCity: string;
+  name?: string;
   notes?: string;
   contactEmail?: string;
   arrivalTime?: string;
