@@ -24,7 +24,7 @@ export const Navbar = () => {
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
               <Bus className="h-4 w-4" />
             </span>
-            <span className="text-base">BusTime</span>
+            <span className="text-base">BusNow</span>
           </Link>
 
           <div className="flex items-center gap-1">

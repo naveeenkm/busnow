@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Bus, MapPin, Sparkles, TrendingUp } from "lucide-react";
+import { Bus, MapPin, Sparkles, TrendingUp, Mail, Linkedin } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { SearchBar } from "@/components/SearchBar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import type { PopularRoute } from "@/types";
 
@@ -15,6 +16,8 @@ const Index = () => {
   useEffect(() => {
     api.get("/buses/popular").then(({ data }) => setRoutes(data.routes || [])).catch(() => {});
   }, []);
+
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const go = (from: string, to: string) =>
     navigate(`/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
@@ -100,8 +103,43 @@ const Index = () => {
       </main>
 
       <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} BusTime. Made for commuters.
+        © {new Date().getFullYear()} BusNow. Made for commuters.{" · "}
+        <button onClick={() => setAboutOpen(true)} className="text-primary underline-offset-4 hover:underline">Contact</button>
       </footer>
+
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground">
+                <Bus className="h-4 w-4" />
+              </span>
+              About BusNow
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            BusNow is a mobile-first app for tracking intercity bus timings in real time. Search routes, save favourites, and never miss your next bus.
+          </p>
+          <div className="mt-2 space-y-2">
+            <a
+              href="mailto:kmnaveen1110@gmail.com"
+              className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent transition-colors"
+            >
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              kmnaveen1110@gmail.com
+            </a>
+            <a
+              href="https://www.linkedin.com/in/naveen-k-m-171109212"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent transition-colors"
+            >
+              <Linkedin className="h-4 w-4 text-muted-foreground" />
+              Naveen K M
+            </a>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

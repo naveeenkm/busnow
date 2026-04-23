@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://busnow.app/sitemap.xml
+Sitemap: https://busnowapp.vercel.app/sitemap.xml

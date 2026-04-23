@@ -52,7 +52,7 @@ const Login = () => {
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
               <Bus className="h-4 w-4" />
             </span>
-            BusTime
+            BusNow
           </Link>
 
           <Tabs value={tab} onValueChange={setTab}>
