@@ -29,8 +29,8 @@ api.interceptors.response.use(
       try {
         // deduplicate: if multiple requests fail at once, share one refresh call
         if (!refreshPromise) {
-          refreshPromise = axios
-            .post(`${baseURL}/auth/refresh`, {}, { withCredentials: true })
+          refreshPromise = api
+            .post("/auth/refresh")
             .then(({ data }) => data.accessToken)
             .finally(() => { refreshPromise = null; });
         }
