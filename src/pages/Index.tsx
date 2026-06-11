@@ -102,8 +102,35 @@ const Index = () => {
         </section>
       </main>
 
+      {/* Download App */}
+      <section className="border-t border-border/60">
+        <div className="container px-4 py-10">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-6 text-center">
+            <div className="flex items-center justify-center gap-2">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Android App</p>
+              <span className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">v 1.0.0</span>
+            </div>
+            <h2 className="mt-1 text-lg font-semibold">BusNow on your phone</h2>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              Real-time timings, favourites, and ride history — right from your Android device.
+            </p>
+            <a
+              href="/downloads/busnow.apk"
+              download
+              className="mt-4 inline-block rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
+            >
+              Download for Android
+            </a>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Android 8.0+ · Enable <span className="font-medium">Install unknown apps</span> before installing.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} BusNow. Made for commuters.{" · "}
+        © {new Date().getFullYear()} BusNow · v 1.0.0{" · "}
         <button onClick={() => setAboutOpen(true)} className="text-primary underline-offset-4 hover:underline">Contact</button>
       </footer>
 
